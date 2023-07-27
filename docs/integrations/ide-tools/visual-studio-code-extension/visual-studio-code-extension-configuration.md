@@ -20,7 +20,7 @@ If you are behind a proxy, configure the proxy settings using VS Code proxy sett
 
 ## Visual Studio Code extension configuration
 
-After the extension is installed, you can set the following configuration options for the extension. Note: Be sure to review the **Advanced** setting **Organization**.&#x20;
+After the extension is installed, you can set the following configuration options for the extension. Note: Be sure to review the **Advanced** setting **Organization**.
 
 * **Features**
   * **Code Security**: configure if code security analysis should run over your code.
@@ -37,7 +37,7 @@ After the extension is installed, you can set the following configuration option
   * **Organization**: specify an Organization to run tests for that Organization. Snyk recommends using `ORG_ID`. If you specify an Organization slug name, the value of the Organization setting `snyk.advanced.organization` must match the URL slug as displayed in the URL of your org in the Snyk UI: `https://app.snyk.io/org/[orgslugname]`. If not specified, the preferred Organization as defined in your [web account settings](https://app.snyk.io/account) is used to run tests.
   * **Custom endpoint**: specify the custom Snyk API endpoint for your Organization. Use this field for the custom endpoint for Single Tenant setups instead of https://app.snyk.io.
   *   **Proxy Strict SSL:** check to specify that the proxy server certificate should be verified against the list of supplied CAs specific to Snyk Code.\
-      &#x20;&#x20;
+
 
       <figure><img src="../../../.gitbook/assets/image (1) (2).png" alt="roxy strict SSL option"><figcaption><p>Proxy strict SSL option</p></figcaption></figure>
   * **Automatic Dependency Management** and **Cli Path**: uncheck to opt out of downloading the CLI through the plugin and thus use your own installation of the CLI. Snyk recommends always using the most recent version of the CLI.

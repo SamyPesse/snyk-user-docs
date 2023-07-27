@@ -56,7 +56,7 @@ For Snyk to understand the different parts and their role, it is necessary to de
 
 This schema is a translated version of the bullet point explanation. A small change to the names of the groups is needed:
 
-<pre class="language-regex"><code class="lang-regex">(?&#x3C;<a data-footnote-ref href="#user-content-fn-1">C0</a>>\d+)\.(?&#x3C;<a data-footnote-ref href="#user-content-fn-2">C1</a>>\d+)_V(?&#x3C;<a data-footnote-ref href="#user-content-fn-3">C2</a>>\d+)
+<pre class="language-regex"><code class="lang-regex">(?&#x3C;<a data-footnote-ref href="#user-content-fn-1">C0</a>>\d+)\.(?&#x3C;C1>\d+)_V(?&#x3C;<a data-footnote-ref href="#user-content-fn-2">C2</a>>\d+)
 </code></pre>
 
 Instead of naming a group "**SIGNIFICANT**", the name is changed to the letter "C" followed by a number. "**C**" stands for "**compare**", and the number represents the significance of that group, where 0 is the most significant.
@@ -84,8 +84,9 @@ snyk/example:1.3_V1-slim
 
 The following ensures that you will receive only recommendations for the flavor you are currently using.
 
-<pre class="language-regex"><code class="lang-regex">(?&#x3C;C0>\d+)\.(?&#x3C;C1>\d+)_V(?&#x3C;C2>\d+)<a data-footnote-ref href="#user-content-fn-4">\-(?&#x3C;M0>.*)</a>
-</code></pre>
+```regex
+(?<C0>\d+)\.(?<C1>\d+)_V(?<C2>\d+)\-(?<M0>.*)
+```
 
 This includes a new group **M0**. "**M**" stands for "**match**." Snyk will use this group to filter out possible image recommendations where the match group's value is not equal.
 
@@ -125,20 +126,20 @@ Next there is a section that indicates the underlying OS distribution. Here, the
 
 Now the expression looks like this:
 
-<pre class="language-regex"><code class="lang-regex">(?&#x3C;C0>\d+)\.(?&#x3C;C1>\d+)\.(?&#x3C;C2>\d+)<a data-footnote-ref href="#user-content-fn-5">_(?&#x3C;M0>deb\d+)_</a>
+<pre class="language-regex"><code class="lang-regex">(?&#x3C;C0>\d+)\.(?&#x3C;C1>\d+)\.(?&#x3C;C2>\d+)<a data-footnote-ref href="#user-content-fn-3">_(?&#x3C;M0>deb\d+)_</a>
 </code></pre>
 
 Next is **the date part**. Sometimes dates are there only to provide more information and need not be taken into consideration when comparing versions. In this case, skip over it.
 
 If the date is important, decide how significant each date part is relative to the “semver” part. Is the **year** part more significant than a **major** version?
 
-To keep the significance order, use the regex:&#x20;
+To keep the significance order, use the regex:
 
 ```regex
 (?<C3>\d{4})(?<C4>\d{2})(?<C5>\d{2})(?<C6>\d{2})
 ```
 
-Since the date is ordered in such a way that the number produced by concatenating the year, month, day, and hour can be compared to another concatenated date correctly, the long regex above can be replaced with a simpler one:&#x20;
+Since the date is ordered in such a way that the number produced by concatenating the year, month, day, and hour can be compared to another concatenated date correctly, the long regex above can be replaced with a simpler one:
 
 ```regex
 (?<C3>\d{10})
@@ -146,10 +147,11 @@ Since the date is ordered in such a way that the number produced by concatenatin
 
 Now the regex looks like this:
 
-<pre class="language-regex"><code class="lang-regex">(?&#x3C;C0>\d+)\.(?&#x3C;C1>\d+)\.(?&#x3C;C2>\d+)_(?&#x3C;M0>deb\d+)<a data-footnote-ref href="#user-content-fn-6">_(?&#x3C;C3>\d{10})</a>
-</code></pre>
+```regex
+(?<C0>\d+)\.(?<C1>\d+)\.(?<C2>\d+)_(?<M0>deb\d+)_(?<C3>\d{10})
+```
 
-The **optional flavor** is last. Add another **MATCH** group here and make it optional:&#x20;
+The **optional flavor** is last. Add another **MATCH** group here and make it optional:
 
 ```regex
 (?:\_(?<M1>.*))?
@@ -157,9 +159,9 @@ The **optional flavor** is last. Add another **MATCH** group here and make it op
 
 This avoids getting `slim` recommended if it is not in use and will only get `slim` recommended if it is being used.
 
-The complete custom versioning schema expression looks like this:&#x20;
+The complete custom versioning schema expression looks like this:
 
-<pre class="language-regex"><code class="lang-regex">(?&#x3C;C0>\d+)\.(?&#x3C;C1>\d+)\.(?&#x3C;C2>\d+)_(?&#x3C;M0>deb\d+)_(?&#x3C;C3>\d{10})<a data-footnote-ref href="#user-content-fn-7">(?:\-(?&#x3C;M1>.*))?</a>
+<pre class="language-regex"><code class="lang-regex">(?&#x3C;C0>\d+)\.(?&#x3C;C1>\d+)\.(?&#x3C;C2>\d+)_(?&#x3C;M0>deb\d+)_(?&#x3C;C3>\d{10})<a data-footnote-ref href="#user-content-fn-4">(?:\-(?&#x3C;M1>.*))?</a>
 </code></pre>
 
 ### Inconsistent tag format (optional groups)
@@ -178,8 +180,9 @@ snyk/example:1.3.5
 
 The above repository contains an inconsistent number of capture groups. Use the following expression to handle this case:
 
-<pre class="language-regex"><code class="lang-regex">(?&#x3C;C0>\d+)\.(?&#x3C;C1>\d+)<a data-footnote-ref href="#user-content-fn-8">(?:\.(?&#x3C;C2>\d+))?</a>
-</code></pre>
+```regex
+(?<C0>\d+)\.(?<C1>\d+)(?:\.(?<C2>\d+))?
+```
 
 The interesting part here is `(?:\.(?<C2>\d+))?`. The expression optionally includes a **compare** group.
 
@@ -321,18 +324,15 @@ Try shortening the string by using [character classes](https://developer.mozilla
 
 If you still require more than 1000 characters to describe your tags, Custom Versioning Schema might not be a great fit. For information about options, contact [Snyk support](https://support.snyk.io/hc/en-us/requests/new).
 
+1. LESS\_SIGNIFICANT
+2. This is what we added
+3. What we added
+4. compare group within an optional non capture group
+
 [^1]: MOST\_SIGNIFICANT
 
-[^2]: LESS\_SIGNIFICANT
+[^2]: LEAST\_SIGNIFICANT
 
-[^3]: LEAST\_SIGNIFICANT
+[^3]: What we added
 
-[^4]: This is what we added
-
-[^5]: What we added
-
-[^6]: What we added
-
-[^7]: What we added
-
-[^8]: compare group within an optional non capture group
+[^4]: What we added
